@@ -3,44 +3,30 @@ package com.example.android.popularmovies;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.ImageView;
-import android.widget.ScrollView;
-import android.widget.TextView;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 
 import com.example.android.popularmovies.network.TheMovieDbApi;
 import com.example.android.popularmovies.network.Utils;
-import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ImageView  mTestImage;
-    private TextView mTestText;
-    private ScrollView mScrollView;
-    private TextView mTestData;
+    private RecyclerView mMoviesGrid;
+    private MovieAdapter mMovieAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mTestText = (TextView) findViewById(R.id.tv_test_text);
-        mTestImage = (ImageView) findViewById(R.id.iv_test_image);
-        mScrollView = (ScrollView) findViewById(R.id.sv_data);
-        mTestData = (TextView) findViewById(R.id.tv_test_data);
+        mMoviesGrid = (RecyclerView) findViewById(R.id.rv_movies);
+        mMoviesGrid.setHasFixedSize(true);
+        mMoviesGrid.setLayoutManager(new GridLayoutManager(this, 2));
 
-        Picasso.with(this)
-                .load("http://i.imgur.com/DvpvklR.png")
-                .into(mTestImage);
-
-
-        mTestText.setText(TheMovieDbApi.getPopularMoviesUrl().toString() + "\n\n\n");
-        mTestText.append(TheMovieDbApi.getTopRatedMoviesUrl().toString());
-
-        // TODO (1): Get network requets working (look at AsyncTask again)
-        URL requestUrl = TheMovieDbApi.getTopRatedMoviesUrl();
+        URL requestUrl = TheMovieDbApi.getPopularMoviesUrl();
         new FetchMovieDataTask().execute(requestUrl);
     }
 
@@ -48,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            // TODO: Implement a loading spinner
         }
 
         @Override
@@ -56,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
                 return null;
             }
 
-            String response = null;
+            String response;
             try {
                 response = Utils.getResponseFromHttpUrl(urls[0]);
                 return response;
@@ -70,9 +57,14 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String response) {
             super.onPostExecute(response);
 
+            // TODO: Implement a loading spinner
             if(response != null) {
-                mTestData.setText(response);
+                mMovieAdapter = new MovieAdapter(TheMovieDbApi.MOVIES_PER_PAGE);
+                mMovieAdapter.setData(response);
+                mMoviesGrid.setAdapter(mMovieAdapter);
             }
+
+            // TODO: Implement an error message and a refresh button if things go wrong
         }
     }
 }
