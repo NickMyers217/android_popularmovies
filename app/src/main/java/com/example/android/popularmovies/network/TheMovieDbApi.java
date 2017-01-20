@@ -6,7 +6,7 @@ import java.net.URL;
 
 public class TheMovieDbApi {
     // TODO: Remember to replace this string your real API key
-    private static final String API_KEY = "3853525219da37c0da177416b9bce384";
+    private static final String API_KEY = "NOT_MY_KEY_LOL";
     private static final String BASE_URL = "https://api.themoviedb.org/3/movie/";
     private static final String POPULAR_PATH = "popular";
     private static final String TOP_RATED_PATH = "top_rated";
