@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String response) {
             super.onPostExecute(response);
 
-            if(response != "" && response != null) {
+            if(response != null) {
                 mTestData.setText(response);
             }
         }
