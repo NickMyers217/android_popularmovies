@@ -5,23 +5,44 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
+import com.example.android.popularmovies.models.Movie;
+import com.example.android.popularmovies.network.TheMovieDbApi;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.ArrayList;
 
+// TODO: Documentation
+class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> {
+    private ArrayList<Movie> mMovies;
+    private MovieClickListener mClickListener;
 
-public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> {
+    interface MovieClickListener {
+        void onItemClick(Movie movie, View v);
+    }
 
-    private int mNumberOfItems;
-    // TODO: Refactor this code to some kind of data model class
-    private JSONArray mMovieList;
+    class MovieViewHolder extends RecyclerView.ViewHolder {
+        private ImageView mMoviePoster;
 
-    public MovieAdapter(int numberOfItems) {
-        mNumberOfItems = numberOfItems;
+        MovieViewHolder(View itemView) {
+            super(itemView);
+            mMoviePoster = (ImageView) itemView.findViewById(R.id.iv_movie_poster);
+        }
+
+        void bind(Movie movie) {
+            String posterUrlString = TheMovieDbApi.getPosterUrlString(movie.posterPath);
+
+            // TODO: Evaluate if this is the best way to size the images responsively
+            Picasso.with(this.itemView.getContext())
+                    .load(posterUrlString)
+                    .resize(itemView.getMinimumWidth(), itemView.getMinimumHeight())
+                    .into(mMoviePoster);
+        }
+    }
+
+    MovieAdapter(ArrayList<Movie> data, MovieClickListener clickListener) {
+        mMovies = data;
+        mClickListener = clickListener;
     }
 
     @Override
@@ -30,56 +51,30 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHol
 
         View view = inflater.inflate(R.layout.movie_item, parent, false);
 
+        // TODO: make this work on all screen sizes and orientations
+        // Set the height of the view holder based on the height of the screen
+        view.setMinimumWidth(parent.getWidth() / 2);
+        view.setMinimumHeight(parent.getHeight() / 2);
+
         return new MovieViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(MovieViewHolder holder, int position) {
-        holder.bind(position);
+    public void onBindViewHolder(final MovieViewHolder holder, final int position) {
+        if(mMovies.size() == 0 || mMovies == null) {
+            return;
+        }
+
+        final Movie movie = mMovies.get(position);
+        holder.bind(movie);
+        holder.mMoviePoster.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mClickListener.onItemClick(movie, v);
+            }
+        });
     }
 
     @Override
-    public int getItemCount() { return mNumberOfItems; }
-
-    public void setData(String data) {
-        // TODO: Refactor this code to some kind of data model class
-        try {
-            mMovieList = new JSONObject(data).getJSONArray("results");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    class MovieViewHolder extends RecyclerView.ViewHolder {
-        private TextView mTestText;
-        private ImageView mMoviePoster;
-
-        MovieViewHolder(View itemView) {
-            super(itemView);
-            mTestText = (TextView) itemView.findViewById(R.id.tv_test_data);
-            mMoviePoster = (ImageView) itemView.findViewById(R.id.iv_movie_poster);
-        }
-
-        void bind(int position) {
-            if(mMovieList == null) {
-                return;
-            }
-
-            // TODO: Refactor this code to some kind of data model class
-            JSONObject movie;
-            try {
-                movie = mMovieList.getJSONObject(position);
-                String posterPath = movie.getString("poster_path");
-                String posterUrlString = "https://image.tmdb.org/t/p/w185/" + posterPath;
-
-                Picasso.with(this.itemView.getContext())
-                        .load(posterUrlString)
-                        .into(mMoviePoster);
-
-                mTestText.setText(posterUrlString);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+    public int getItemCount() { return mMovies.size(); }
 }

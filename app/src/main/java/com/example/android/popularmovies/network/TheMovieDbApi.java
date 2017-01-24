@@ -7,11 +7,11 @@ import java.net.URL;
 public class TheMovieDbApi {
     // TODO: Remember to replace this string your real API key
     private static final String API_KEY = "NOT_MY_KEY";
+
     private static final String BASE_URL = "https://api.themoviedb.org/3/movie/";
+    private static final String POSTER_BASE_URL = "https://image.tmdb.org/t/p/w185/";
     private static final String POPULAR_PATH = "popular";
     private static final String TOP_RATED_PATH = "top_rated";
-
-    public static final int MOVIES_PER_PAGE = 20;
 
     /**
      * Constructs the correct theMovieDb API endpoint for the given string path.
@@ -45,5 +45,15 @@ public class TheMovieDbApi {
      */
     public static URL getTopRatedMoviesUrl() {
         return constructEndpointUrl(TOP_RATED_PATH);
+    }
+
+    /**
+     * Returns the full URL for the given posterPath as a String
+     *
+     * @param posterPath String representing the path of the desired poster
+     * @return The URL for the poster as a string
+     */
+    public static String getPosterUrlString(String posterPath) {
+        return POSTER_BASE_URL + posterPath;
     }
 }

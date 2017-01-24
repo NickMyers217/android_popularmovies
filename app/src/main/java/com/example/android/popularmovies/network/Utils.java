@@ -16,7 +16,7 @@ public class Utils {
      * @param uri The input uri.
      * @return The resulting url address.
      */
-    public static URL convertUriToUrl(Uri uri) {
+    static URL convertUriToUrl(Uri uri) {
         URL result = null;
         try {
             result = new URL(uri.toString());
