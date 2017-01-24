@@ -21,6 +21,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 // TODO: Documentation
+// TODO: Add a menu with a button to change the sort order
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView mMoviesGrid;
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         new FetchMovieDataTask().execute(requestUrl);
     }
 
+    // TODO: Look into using onConfigurationChanged to update the adapter and its viewholders for changes from portrait to landscape
 
     public class FetchMovieDataTask extends AsyncTask<URL, Void, String> {
         @Override

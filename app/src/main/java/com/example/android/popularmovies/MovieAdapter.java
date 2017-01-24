@@ -4,40 +4,19 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import com.example.android.popularmovies.models.Movie;
-import com.example.android.popularmovies.network.TheMovieDbApi;
-import com.squareup.picasso.Picasso;
+import com.example.android.popularmovies.views.MovieViewHolder;
 
 import java.util.ArrayList;
 
 // TODO: Documentation
-class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> {
+class MovieAdapter extends RecyclerView.Adapter<MovieViewHolder> {
     private ArrayList<Movie> mMovies;
     private MovieClickListener mClickListener;
 
     interface MovieClickListener {
         void onItemClick(Movie movie, View v);
-    }
-
-    class MovieViewHolder extends RecyclerView.ViewHolder {
-        private ImageView mMoviePoster;
-
-        MovieViewHolder(View itemView) {
-            super(itemView);
-            mMoviePoster = (ImageView) itemView.findViewById(R.id.iv_movie_poster);
-        }
-
-        void bind(Movie movie) {
-            String posterUrlString = TheMovieDbApi.getPosterUrlString(movie.posterPath);
-
-            // TODO: Evaluate if this is the best way to size the images responsively
-            Picasso.with(this.itemView.getContext())
-                    .load(posterUrlString)
-                    .resize(itemView.getMinimumWidth(), itemView.getMinimumHeight())
-                    .into(mMoviePoster);
-        }
     }
 
     MovieAdapter(ArrayList<Movie> data, MovieClickListener clickListener) {
@@ -67,7 +46,7 @@ class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieViewHolder> {
 
         final Movie movie = mMovies.get(position);
         holder.bind(movie);
-        holder.mMoviePoster.setOnClickListener(new View.OnClickListener() {
+        holder.getMoviePoster().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mClickListener.onItemClick(movie, v);

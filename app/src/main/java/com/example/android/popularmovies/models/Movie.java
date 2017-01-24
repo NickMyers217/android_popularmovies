@@ -6,16 +6,21 @@ import android.os.Parcelable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-// TODO: Look into some kind of JSON deserialization/mapping library to cut down the code in here
+// TODO: Documentation
 public class Movie implements Parcelable {
     public String title;
     public String posterPath;
+    public String overview;
+    public float voteAverage;
+    public String releaseDate;
 
     public Movie(JSONObject movieJson) {
-        // TODO: Implement the rest of the fields as needed for the details activity
         try {
-            title = movieJson.getString("title");
+            title = movieJson.getString("original_title");
             posterPath = movieJson.getString("poster_path");
+            overview = movieJson.getString("overview");
+            voteAverage = Float.parseFloat(movieJson.getString("vote_average"));
+            releaseDate = movieJson.getString("release_date");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -24,6 +29,9 @@ public class Movie implements Parcelable {
     private Movie(Parcel in) {
         title = in.readString();
         posterPath = in.readString();
+        overview = in.readString();
+        voteAverage = Float.parseFloat(in.readString());
+        releaseDate = in.readString();
     }
 
     public static final Creator<Movie> CREATOR = new Creator<Movie>() {
@@ -45,5 +53,8 @@ public class Movie implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(title);
         dest.writeString(posterPath);
+        dest.writeString(overview);
+        dest.writeString(String.valueOf(voteAverage));
+        dest.writeString(releaseDate);
     }
 }
