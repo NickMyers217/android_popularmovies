@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.example.android.popularmovies.models.Movie;
@@ -21,11 +23,12 @@ import java.net.URL;
 import java.util.ArrayList;
 
 // TODO: Documentation
-// TODO: Add a menu with a button to change the sort order
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView mMoviesGrid;
     private MovieAdapter mMovieAdapter;
+
+    private enum SortOrder { POPULAR, TOP_RATED }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +39,34 @@ public class MainActivity extends AppCompatActivity {
         mMoviesGrid.setHasFixedSize(true);
         mMoviesGrid.setLayoutManager(new GridLayoutManager(this, 2));
 
-        URL requestUrl = TheMovieDbApi.getPopularMoviesUrl();
+        changeSortOrder(SortOrder.POPULAR);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.popular:
+                changeSortOrder(SortOrder.POPULAR);
+                return true;
+            case R.id.top_rated:
+                changeSortOrder(SortOrder.TOP_RATED);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void changeSortOrder(SortOrder order) {
+        URL requestUrl = order == SortOrder.POPULAR
+                ? TheMovieDbApi.getPopularMoviesUrl()
+                : TheMovieDbApi.getTopRatedMoviesUrl();
+
         new FetchMovieDataTask().execute(requestUrl);
     }
 
