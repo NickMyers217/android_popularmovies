@@ -6,9 +6,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.example.android.popularmovies.models.Movie;
 import com.example.android.popularmovies.network.TheMovieDbApi;
@@ -27,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerView mMoviesGrid;
     private MovieAdapter mMovieAdapter;
+    private TextView mErrorMessage;
+    private ProgressBar mLoadingSpinner;
 
     private enum SortOrder { POPULAR, TOP_RATED }
 
@@ -38,6 +43,13 @@ public class MainActivity extends AppCompatActivity {
         mMoviesGrid = (RecyclerView) findViewById(R.id.rv_movies);
         mMoviesGrid.setHasFixedSize(true);
         mMoviesGrid.setLayoutManager(new GridLayoutManager(this, 2));
+
+        mMovieAdapter = new MovieAdapter();
+        mMoviesGrid.setAdapter(mMovieAdapter);
+
+        mErrorMessage = (TextView) findViewById(R.id.tv_error_message_display);
+
+        mLoadingSpinner = (ProgressBar) findViewById(R.id.pb_loading_spinner);
 
         changeSortOrder(SortOrder.POPULAR);
     }
@@ -62,6 +74,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // TODO: Look into using onConfigurationChanged to update the adapter and its viewholders for changes from portrait to landscape
+
     private void changeSortOrder(SortOrder order) {
         URL requestUrl = order == SortOrder.POPULAR
                 ? TheMovieDbApi.getPopularMoviesUrl()
@@ -70,17 +84,25 @@ public class MainActivity extends AppCompatActivity {
         new FetchMovieDataTask().execute(requestUrl);
     }
 
-    // TODO: Look into using onConfigurationChanged to update the adapter and its viewholders for changes from portrait to landscape
+    private void showMovies() {
+        mErrorMessage.setVisibility(View.INVISIBLE);
+        mMoviesGrid.setVisibility(View.VISIBLE);
+    }
 
-    public class FetchMovieDataTask extends AsyncTask<URL, Void, String> {
+    private void showErrorMessage() {
+        mMoviesGrid.setVisibility(View.INVISIBLE);
+        mErrorMessage.setVisibility(View.VISIBLE);
+    }
+
+    public class FetchMovieDataTask extends AsyncTask<URL, Void, ArrayList<Movie>> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            // TODO: Implement a loading spinner
+            mLoadingSpinner.setVisibility(View.VISIBLE);
         }
 
         @Override
-        protected String doInBackground(URL... urls) {
+        protected ArrayList<Movie> doInBackground(URL... urls) {
             if(urls.length == 0) {
                 return null;
             }
@@ -88,36 +110,40 @@ public class MainActivity extends AppCompatActivity {
             String response;
             try {
                 response = Utils.getResponseFromHttpUrl(urls[0]);
-                return response;
+
+                // TODO: Check the amount of results in the JSON
+                JSONArray moviesJson = new JSONObject(response).getJSONArray("results");
+                ArrayList<Movie> moviesData = new ArrayList<>();
+
+                for(int i = 0; i < moviesJson.length(); i++) {
+                    moviesData.add(new Movie(moviesJson.getJSONObject(i)));
+                }
+
+                return moviesData;
             } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            } catch (JSONException e) {
                 e.printStackTrace();
                 return null;
             }
         }
 
         @Override
-        protected void onPostExecute(String response) {
-            super.onPostExecute(response);
+        protected void onPostExecute(ArrayList<Movie> moviesData) {
+            super.onPostExecute(moviesData);
+            mLoadingSpinner.setVisibility(View.INVISIBLE);
 
-            // TODO: Implement a loading spinner
-            if(response == null) {
+            if(moviesData == null) {
+                showErrorMessage();
+                Log.e(this.getClass().getSimpleName(), "Network error, error message shown.");
+                // TODO: Implement a try again button
                 return;
             }
 
-            // TODO: Check the amount of results in the JSON
-            JSONArray moviesJson;
-            ArrayList<Movie> moviesData = new ArrayList<>();
-            try {
-                moviesJson = new JSONObject(response).getJSONArray("results");
-
-                for(int i = 0; i < moviesJson.length(); i++) {
-                    moviesData.add(new Movie(moviesJson.getJSONObject(i)));
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            mMovieAdapter = new MovieAdapter(moviesData, new MovieAdapter.MovieClickListener() {
+            showMovies();
+            mMovieAdapter.setMovies(moviesData);
+            mMovieAdapter.setClickListener(new MovieAdapter.MovieClickListener(){
                 @Override
                 public void onItemClick(Movie movie, View v) {
                     Intent detailsIntent = new Intent(MainActivity.this, DetailsActivity.class);
@@ -125,9 +151,6 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(detailsIntent);
                 }
             });
-            mMoviesGrid.setAdapter(mMovieAdapter);
-
-            // TODO: Implement an error message and a refresh button if things go wrong
         }
     }
 }

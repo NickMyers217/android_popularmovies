@@ -12,17 +12,14 @@ import java.util.ArrayList;
 
 // TODO: Documentation
 class MovieAdapter extends RecyclerView.Adapter<MovieViewHolder> {
-    private ArrayList<Movie> mMovies;
+    private ArrayList<Movie> mMovies = new ArrayList<>();
     private MovieClickListener mClickListener;
 
     interface MovieClickListener {
         void onItemClick(Movie movie, View v);
     }
 
-    MovieAdapter(ArrayList<Movie> data, MovieClickListener clickListener) {
-        mMovies = data;
-        mClickListener = clickListener;
-    }
+    MovieAdapter() {}
 
     @Override
     public MovieViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -56,4 +53,13 @@ class MovieAdapter extends RecyclerView.Adapter<MovieViewHolder> {
 
     @Override
     public int getItemCount() { return mMovies.size(); }
+
+    void setClickListener(MovieClickListener mClickListener) {
+        this.mClickListener = mClickListener;
+    }
+
+    void setMovies(ArrayList<Movie> mMovies) {
+        this.mMovies = mMovies;
+        notifyDataSetChanged();
+    }
 }
