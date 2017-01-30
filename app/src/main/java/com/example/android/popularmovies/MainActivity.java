@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
-// TODO: Documentation
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView mMoviesGrid;
@@ -40,17 +39,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Create the RecyclerView and set it's LayoutManager to a Grid
         mMoviesGrid = (RecyclerView) findViewById(R.id.rv_movies);
         mMoviesGrid.setHasFixedSize(true);
         mMoviesGrid.setLayoutManager(new GridLayoutManager(this, 2));
 
+        // Create an empty Adapter and set it
         mMovieAdapter = new MovieAdapter();
         mMoviesGrid.setAdapter(mMovieAdapter);
 
         mErrorMessage = (TextView) findViewById(R.id.tv_error_message_display);
-
         mLoadingSpinner = (ProgressBar) findViewById(R.id.pb_loading_spinner);
 
+        // Default the SortOrder to POPULAR
         changeSortOrder(SortOrder.POPULAR);
     }
 
@@ -76,6 +77,11 @@ public class MainActivity extends AppCompatActivity {
 
     // TODO: Look into using onConfigurationChanged to update the adapter and its viewholders for changes from portrait to landscape
 
+    /**
+     * Create a URL for the given SortOrder and initiate a FetchMovieDataTask with it.
+     *
+     * @param order The desired SortOrder.
+     */
     private void changeSortOrder(SortOrder order) {
         URL requestUrl = order == SortOrder.POPULAR
                 ? TheMovieDbApi.getPopularMoviesUrl()
@@ -94,6 +100,11 @@ public class MainActivity extends AppCompatActivity {
         mErrorMessage.setVisibility(View.VISIBLE);
     }
 
+    /**
+     * An Implementation of AsyncTask to get themoviedb.org movie data over the network.
+     *
+     * The task accepts a URL, has no progress updates, and returns an ArrayList of Movies.
+     */
     public class FetchMovieDataTask extends AsyncTask<URL, Void, ArrayList<Movie>> {
         @Override
         protected void onPreExecute() {
@@ -109,12 +120,14 @@ public class MainActivity extends AppCompatActivity {
 
             String response;
             try {
+                // Make an https request with the input URL
                 response = Utils.getResponseFromHttpUrl(urls[0]);
 
-                // TODO: Check the amount of results in the JSON
+                // Parse a JSONObject from the response, and get the results array out of it
                 JSONArray moviesJson = new JSONObject(response).getJSONArray("results");
-                ArrayList<Movie> moviesData = new ArrayList<>();
 
+                // Parse each item in the results array into a Movie, and add it to an ArrayList.
+                ArrayList<Movie> moviesData = new ArrayList<>();
                 for(int i = 0; i < moviesJson.length(); i++) {
                     moviesData.add(new Movie(moviesJson.getJSONObject(i)));
                 }
@@ -137,15 +150,17 @@ public class MainActivity extends AppCompatActivity {
             if(moviesData == null) {
                 showErrorMessage();
                 Log.e(this.getClass().getSimpleName(), "Network error, error message shown.");
-                // TODO: Implement a try again button
+                // TODO: Implement a try again button?
                 return;
             }
 
+            // Show the RecyclerView and make sure to set the Adapter data and MovieClickListener
             showMovies();
             mMovieAdapter.setMovies(moviesData);
             mMovieAdapter.setClickListener(new MovieAdapter.MovieClickListener(){
                 @Override
                 public void onItemClick(Movie movie, View v) {
+                    // Dispatch an Intent to open the Details activity with the Movie data
                     Intent detailsIntent = new Intent(MainActivity.this, DetailsActivity.class);
                     detailsIntent.putExtra("movieData", movie);
                     startActivity(detailsIntent);

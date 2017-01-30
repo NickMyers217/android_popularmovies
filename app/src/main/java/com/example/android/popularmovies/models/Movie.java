@@ -6,7 +6,9 @@ import android.os.Parcelable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-// TODO: Documentation
+/**
+ * This class represents the data model for a movie in the app.
+ */
 public class Movie implements Parcelable {
     public String title;
     public String posterPath;
@@ -14,6 +16,11 @@ public class Movie implements Parcelable {
     public float voteAverage;
     public String releaseDate;
 
+    /**
+     * A constructor that builds a Movie object from a JSONObject.
+     *
+     * @param movieJson A JSONObject that contains all the necessary fields for the movie.
+     */
     public Movie(JSONObject movieJson) {
         try {
             title = movieJson.getString("original_title");
@@ -26,6 +33,11 @@ public class Movie implements Parcelable {
         }
     }
 
+    /**
+     * A constructor that builds a movie from a Parcel object.
+     *
+     * @param in A Parcel object that contains the correct fields for the Movie.
+     */
     private Movie(Parcel in) {
         title = in.readString();
         posterPath = in.readString();

@@ -9,7 +9,11 @@ import com.example.android.popularmovies.models.Movie;
 import com.example.android.popularmovies.network.TheMovieDbApi;
 import com.squareup.picasso.Picasso;
 
-// TODO: Documentation
+/**
+ * An implementation of ViewHolder to be used for the RecyclerView's grid items.
+ *
+ * It just shows a Movie's poster image.
+ */
 public class MovieViewHolder extends RecyclerView.ViewHolder {
     private ImageView mMoviePoster;
 
@@ -18,10 +22,14 @@ public class MovieViewHolder extends RecyclerView.ViewHolder {
         mMoviePoster = (ImageView) itemView.findViewById(R.id.iv_movie_poster);
     }
 
+    /**
+     * Binds data from a Movie to the ViewHolder.
+     *
+     * @param movie A Movie that you want to populate ViewHolder with.
+     */
     public void bind(Movie movie) {
         String posterUrlString = TheMovieDbApi.getPosterUrlString(movie.posterPath);
 
-        // TODO: Evaluate if this is the best way to size the images responsively
         // TODO: Make sure this supports all the apis
         Picasso.with(itemView.getContext())
                 .load(posterUrlString)

@@ -10,7 +10,14 @@ import com.example.android.popularmovies.views.MovieViewHolder;
 
 import java.util.ArrayList;
 
-// TODO: Documentation
+
+/**
+ * An implementation of RecyclerView.Adapter for the app's RecyclerView
+ *
+ * It contains an ArrayList of Movies that are bound to ViewHolders.
+ * The VieHolders form a grid layout of Movie posters.
+ * It also implements a MovieClickListener for each ViewHolder.
+ */
 class MovieAdapter extends RecyclerView.Adapter<MovieViewHolder> {
     private ArrayList<Movie> mMovies = new ArrayList<>();
     private MovieClickListener mClickListener;
