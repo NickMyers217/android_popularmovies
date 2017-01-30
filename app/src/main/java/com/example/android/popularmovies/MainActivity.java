@@ -25,12 +25,17 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class MainActivity extends AppCompatActivity {
 
-    private RecyclerView mMoviesGrid;
+    // Use ButterKnife for view binding
+    @BindView(R.id.rv_movies) RecyclerView mMoviesGrid;
+    @BindView(R.id.tv_error_message_display) TextView mErrorMessage;
+    @BindView(R.id.pb_loading_spinner) ProgressBar mLoadingSpinner;
+
     private MovieAdapter mMovieAdapter;
-    private TextView mErrorMessage;
-    private ProgressBar mLoadingSpinner;
 
     private enum SortOrder { POPULAR, TOP_RATED }
 
@@ -39,17 +44,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Use ButterKnife for view binding
+        ButterKnife.bind(this);
+
         // Create the RecyclerView and set it's LayoutManager to a Grid
-        mMoviesGrid = (RecyclerView) findViewById(R.id.rv_movies);
         mMoviesGrid.setHasFixedSize(true);
         mMoviesGrid.setLayoutManager(new GridLayoutManager(this, 2));
 
         // Create an empty Adapter and set it
         mMovieAdapter = new MovieAdapter();
         mMoviesGrid.setAdapter(mMovieAdapter);
-
-        mErrorMessage = (TextView) findViewById(R.id.tv_error_message_display);
-        mLoadingSpinner = (ProgressBar) findViewById(R.id.pb_loading_spinner);
 
         // Default the SortOrder to POPULAR
         changeSortOrder(SortOrder.POPULAR);

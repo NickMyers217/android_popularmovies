@@ -6,7 +6,7 @@ import java.net.URL;
 
 public class TheMovieDbApi {
     // TODO: Remember to replace this string your real API key from the themoviedb.org
-    private static final String API_KEY = "YOU_KEY_GOES_HERE";
+    private static final String API_KEY = "YOUR_KEY_GOES_HERE";
 
     private static final String BASE_URL = "https://api.themoviedb.org/3/movie/";
     private static final String POSTER_BASE_URL = "https://image.tmdb.org/t/p/w185/";

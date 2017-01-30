@@ -9,16 +9,22 @@ import com.example.android.popularmovies.models.Movie;
 import com.example.android.popularmovies.network.TheMovieDbApi;
 import com.squareup.picasso.Picasso;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class DetailsActivity extends AppCompatActivity {
+    @BindView(R.id.tv_movie_title) TextView mTitle;
+    @BindView(R.id.iv_movie_details_poster) ImageView mPoster;
+    @BindView(R.id.tv_overview) TextView mOverview;
+    @BindView(R.id.tv_vote_average) TextView mVoteAverage;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
 
-        TextView mTitle = (TextView) findViewById(R.id.tv_movie_title);
-        ImageView mPoster = (ImageView) findViewById(R.id.iv_movie_details_poster);
-        TextView mOverview = (TextView) findViewById(R.id.tv_overview);
-        TextView mVoteAverage = (TextView) findViewById(R.id.tv_vote_average);
+        // Use ButterKnife for view binding
+        ButterKnife.bind(this);
 
         Movie movie = getIntent().getParcelableExtra("movieData");
 
